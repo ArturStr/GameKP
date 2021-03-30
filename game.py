@@ -6,21 +6,20 @@ win = pg.display.set_mode((512, 512))
 
 pg.display.set_caption('Plane')
 
-walkRight = [pg.image.load('1.png'), pg.image.load('2.png')]
-walkLeft = [pg.image.load('-1.png'), pg.image.load('-2.png')]
-planeStand = pg.image.load('0.png')
 bg = pg.image.load('bg.bmp')
 
 clock = pg.time.Clock()
 
-width = 40
+width = 67
 height = 60
-speed = 3
+speed = 5
 x = 250-width/2
 y = 430
+y_shot = y
 
 left = False
 right = False
+isShot = False
 animCount = 0
 
 
@@ -32,13 +31,19 @@ def drawWindow():
         animCount = 0
 
     if left:
-        win.blit(walkLeft[animCount // 15], (x, y))
+        win.blit(pg.image.load('-.png'), (x, y))
         animCount += 1
     elif right:
-        win.blit(walkRight[animCount // 15], (x, y))
+        win.blit(pg.image.load('+.png'), (x, y))
         animCount += 1
     else:
-        win.blit(planeStand, (x, y))
+        win.blit(pg.image.load('0.png'), (x, y))
+
+    if isShot:
+        pg.draw.line(win, (0, 255, 255), (x + 37, y+20), (x + 37, 0), 2)
+        pg.draw.line(win, (0, 255, 255), (x + 32, y+20), (x + 32, 0), 2)
+        pg.draw.line(win, (0, 0, 255), (x + 35, y+20), (x + 35, 0), 3)
+        animCount += 1
 
     pg.display.update()
 
@@ -52,7 +57,7 @@ while run:
             run = False
 
     keys = pg.key.get_pressed()
-    if keys[pg.K_LEFT] and x > 20:
+    if keys[pg.K_LEFT] and x > 25:
         x -= speed
         left = True
         right = False
@@ -60,10 +65,20 @@ while run:
         x += speed
         left = False
         right = True
+    elif keys[pg.K_LEFT] and keys[pg.K_RIGHT]:
+        left = False
+        right = False
+        animCount = 0
     else:
         left = False
         right = False
         animCount = 0
+
+    if not(isShot):
+        if keys[pg.K_SPACE]:
+            isShot = True
+    else:
+        isShot = False
 
     drawWindow()
 
