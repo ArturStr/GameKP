@@ -13,7 +13,7 @@ clock = pg.time.Clock()
 width = 67
 height = 60
 speed = 5
-x = 250-width/2
+x = 250 - width / 2
 y = 430
 y_shot = y
 
@@ -21,6 +21,19 @@ left = False
 right = False
 isShot = False
 animCount = 0
+
+
+class attack():
+    def __init__(self, x, y, radius, color):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+        self.vel = 8
+
+    def draw(self, win):
+        pg.draw.circle(win, self.color, (self.x, self.y), self.radius)
+        pg.draw.circle(win, (0, 255, 0), (self.x, self.y), self.radius - 3)
 
 
 def drawWindow():
@@ -39,15 +52,14 @@ def drawWindow():
     else:
         win.blit(pg.image.load('0.png'), (x, y))
 
-    if isShot:
-        pg.draw.line(win, (0, 255, 255), (x + 37, y+20), (x + 37, 0), 2)
-        pg.draw.line(win, (0, 255, 255), (x + 32, y+20), (x + 32, 0), 2)
-        pg.draw.line(win, (0, 0, 255), (x + 35, y+20), (x + 35, 0), 3)
-        animCount += 1
+    for bullet in bullets:
+        bullet.draw(win)
 
     pg.display.update()
 
 
+bullets = []
+rate = 0
 run = True
 while run:
     clock.tick(30)
@@ -61,7 +73,7 @@ while run:
         x -= speed
         left = True
         right = False
-    elif keys[pg.K_RIGHT] and x < 500-width-20:
+    elif keys[pg.K_RIGHT] and x < 500 - width - 20:
         x += speed
         left = False
         right = True
@@ -74,13 +86,19 @@ while run:
         right = False
         animCount = 0
 
-    if not(isShot):
-        if keys[pg.K_SPACE]:
-            isShot = True
-    else:
-        isShot = False
+    for bullet in bullets:
+        if bullet.y > 20:
+            bullet.y -= bullet.vel
+        else:
+            bullets.pop(bullets.index(bullet))
+
+    if keys[pg.K_SPACE]:
+        if len(bullets) < 5 and rate % 15 == 0:
+            bullets.append(attack(round(x + 35), round(y + 20), 5, (255, 0, 0)))
+        rate += 1
+        if rate > 90:
+            rate = 1
 
     drawWindow()
-
 
 pg.quit()
