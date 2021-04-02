@@ -1,5 +1,5 @@
 import random
-import pygame as pg
+from animations import *
 
 pg.init()
 
@@ -7,47 +7,29 @@ win = pg.display.set_mode((512, 512))
 
 pg.display.set_caption('Plane')
 
+pg.display.set_icon(pg.image.load('img/icon.png'))
+
 bg = pg.image.load('img/bg.bmp')
 
 clock = pg.time.Clock()
 
 width = 67
 height = 60
-speed = 5
+speed = 6
 x = 250 - width / 2
 y = 430
 y_shot = y
 
 bullets = []
 enemies = []
-rate = 0
 planeRate = 0
 enemySpeed = 3
+rate = 0
 
 left = False
 right = False
 isShot = False
 animCount = 0
-
-class enemyPlane():
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def draw(self, win):
-        win.blit(pg.image.load('img/enemy.png'), (self.x, self.y))
-
-class attack():
-    def __init__(self, x, y, radius, color):
-        self.x = x
-        self.y = y
-        self.radius = radius
-        self.color = color
-        self.vel = 8
-
-    def draw(self, win):
-        pg.draw.circle(win, self.color, (self.x, self.y), self.radius)
-        pg.draw.circle(win, (0, 255, 0), (self.x, self.y), self.radius - 3)
 
 
 def drawWindow():
@@ -74,6 +56,7 @@ def drawWindow():
 
     pg.display.update()
 
+
 run = True
 
 while run:
@@ -84,11 +67,11 @@ while run:
             run = False
 
     keys = pg.key.get_pressed()
-    if keys[pg.K_LEFT] and x > 25:
+    if (keys[pg.K_LEFT] or keys[pg.K_a]) and x > 25:
         x -= speed
         left = True
         right = False
-    elif keys[pg.K_RIGHT] and x < 500 - width - 20:
+    elif (keys[pg.K_RIGHT] or keys[pg.K_d]) and x < 500 - width - 20:
         x += speed
         left = False
         right = True
@@ -108,10 +91,10 @@ while run:
             bullets.pop(bullets.index(bullet))
 
     if keys[pg.K_SPACE]:
-        if len(bullets) < 5 and rate % 5 == 0:
-            bullets.append(attack(round(x + 35), round(y + 20), 5, (255, 0, 0)))
+        if rate % 7 == 0:
+            bullets.append(Attack(round(x + 35), round(y + 20)))
         rate += 1
-        if rate > 6:
+        if rate > 8:
             rate = 1
 
     for enemy in enemies:
@@ -120,12 +103,21 @@ while run:
         else:
             enemies.pop(enemies.index(enemy))
 
-    if len(enemies) < 3 and round(planeRate) % 8 == 0:
-        enemies.append(enemyPlane(random.randint(20, 420), -55))
+    if len(enemies) < random.randint(2, 5) and planeRate % 8 == 0:
+        enemies.append(EnemyPlane(random.randint(20, 420), -55))
     planeRate += 1
 
     if planeRate > 8:
         planeRate = 1
+
+    for enemy in enemies:
+        for bullet in bullets:
+            if enemy.x - 5 < bullet.x < enemy.x + 50 and \
+                    enemy.y - 15 < bullet.y < enemy.y + 15:
+                a = True
+                if a:
+                    enemies.pop(enemies.index(enemy))
+                    bullets.pop(bullets.index(bullet))
 
     drawWindow()
 
