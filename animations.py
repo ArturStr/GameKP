@@ -2,7 +2,6 @@ import pygame as pg
 
 
 class EnemyPlane(pg.sprite.Sprite):
-
     def __init__(self, x, y):
         super(EnemyPlane, self).__init__()
 
@@ -29,4 +28,3 @@ class Attack(pg.sprite.Sprite):
 
     def draw(self, win):
         win.blit(self.image, (self.x - 11, self.y - 11))
-
