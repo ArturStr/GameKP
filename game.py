@@ -22,27 +22,27 @@ height = 60
 speed = 6
 x = 250 - width / 2
 y = 430
-y_shot = y
 
 bullets = []
 enemies = []
 hits = []
 planeRate = 0
 enemySpeed = 3
+bulletSpeed = 8
 rate = 0
 scores = 1
 
 left = False
 right = False
-isShot = False
-animCount = 0
 boomCount = 0
 
-
+font = pg.font.SysFont('comicsansms', 32, True, True)
+drawScore = font.render(str(scores - 1), True, (47, 79, 79))
 
 def drawWindow():
     global boomCount
     win.blit(bg, (0, 0))
+    win.blit(drawScore, (0, 0))
     if left:
         win.blit(pg.image.load('img/-.png'), (x, y))
     elif right:
@@ -101,20 +101,21 @@ while run:
 
     if keys[pg.K_SPACE]:
         if rate % 7 == 0:
-            bullets.append(Attack(round(x + 35), round(y + 20)))
+            bullets.append(Attack(round(x + 35), round(y + 20), bulletSpeed))
         rate += 1
         if rate > 8:
             rate = 1
 
     for enemy in enemies:
         if enemy.y < 420:
-            enemy.y += enemySpeed
+            enemy.y += enemy.speed
         else:
             enemies.pop(enemies.index(enemy))
             # run = False
 
     if len(enemies) < random.randint(2, 5) and planeRate % 8 == 0:
-        enemies.append(EnemyPlane(random.randint(20, 420), -55))
+        enemies.append(EnemyPlane(random.randint(20, 420), -55,
+                                  random.randint(enemySpeed, enemySpeed+2)))
     planeRate += 1
 
     if planeRate > 8:
@@ -130,11 +131,22 @@ while run:
                     bullets.pop(bullets.index(bullet))
                     hits.append([enemy.x, enemy.y])
                     scores += 1
+                    drawScore = font.render(str(scores-1), True, (47, 79, 79))
 
-    if scores % 50 == 0:
-        enemySpeed += 0.1
-        speed += 0.1
+    if scores == 10:
+        speed = 7
+        enemySpeed = 4
+    elif scores == 100:
+        enemySpeed = 5
+    elif scores == 120:
+        enemySpeed = 6
+
 
     drawWindow()
+
+
+if scores-1 % 10 == 0:
+    enemySpeed += 1
+    speed += 1
 
 pg.quit()
