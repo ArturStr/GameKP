@@ -3,13 +3,13 @@ from animations import *
 
 pg.init()
 
-win = pg.display.set_mode((512, 512))
+win = pg.display.set_mode((500, 500))
 
 pg.display.set_caption('Plane')
 
 pg.display.set_icon(pg.image.load('img/icon.png'))
 
-bg = pg.image.load('img/bg.bmp')
+bg = pg.image.load('img/bg2.jpg')
 
 clock = pg.time.Clock()
 
@@ -22,6 +22,7 @@ height = 60
 speed = 6
 x = 250 - width / 2
 y = 430
+bg_y = -800
 
 bullets = []
 enemies = []
@@ -41,7 +42,7 @@ drawScore = font.render(str(scores - 1), True, (47, 79, 79))
 
 def drawWindow():
     global boomCount
-    win.blit(bg, (0, 0))
+    win.blit(bg, (0, bg_y))
     win.blit(drawScore, (0, 0))
     if left:
         win.blit(pg.image.load('img/-.png'), (x, y))
@@ -70,6 +71,11 @@ run = True
 
 while run:
     clock.tick(30)
+
+    if bg_y < 0:
+        bg_y += 1
+    else:
+        bg_y = -800
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -141,12 +147,6 @@ while run:
     elif scores == 120:
         enemySpeed = 6
 
-
     drawWindow()
-
-
-if scores-1 % 10 == 0:
-    enemySpeed += 1
-    speed += 1
 
 pg.quit()
