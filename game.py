@@ -32,18 +32,23 @@ enemySpeed = 3
 bulletSpeed = 8
 rate = 0
 scores = 1
+HP = 5
 
 left = False
 right = False
 boomCount = 0
+g_over = True
 
-font = pg.font.SysFont('comicsansms', 32, True, True)
-drawScore = font.render(str(scores - 1), True, (47, 79, 79))
+font = pg.font.SysFont('comicsansms', 15, True, True)
+drawScore = font.render(f'Score: {scores - 1}', True, (47, 248, 82))
+drawHP = font.render(f'HP: {HP}', True, (255, 18, 13))
+
 
 def drawWindow():
     global boomCount
     win.blit(bg, (0, bg_y))
     win.blit(drawScore, (0, 0))
+    win.blit(drawHP, (450, 0))
     if left:
         win.blit(pg.image.load('img/-.png'), (x, y))
     elif right:
@@ -67,11 +72,11 @@ def drawWindow():
 
     pg.display.update()
 
-run = True
 
+run = True
 while run:
     clock.tick(30)
-
+    keys = pg.key.get_pressed()
     if bg_y < 0:
         bg_y += 1
     else:
@@ -81,7 +86,6 @@ while run:
         if event.type == pg.QUIT:
             run = False
 
-    keys = pg.key.get_pressed()
     if (keys[pg.K_LEFT] or keys[pg.K_a]) and x > 25:
         x -= speed
         left = True
@@ -117,11 +121,15 @@ while run:
             enemy.y += enemy.speed
         else:
             enemies.pop(enemies.index(enemy))
-            # run = False
+            HP -= 1
+            drawHP = font.render(f'HP: {HP}', True, (255, 18, 13))
+            if HP == 0:
+                pg.time.delay(200)
+                run = False
 
     if len(enemies) < random.randint(2, 5) and planeRate % 8 == 0:
         enemies.append(EnemyPlane(random.randint(20, 420), -55,
-                                  random.randint(enemySpeed, enemySpeed+2)))
+                                  random.randint(enemySpeed, enemySpeed + 2)))
     planeRate += 1
 
     if planeRate > 8:
@@ -137,7 +145,7 @@ while run:
                     bullets.pop(bullets.index(bullet))
                     hits.append([enemy.x, enemy.y])
                     scores += 1
-                    drawScore = font.render(str(scores-1), True, (47, 79, 79))
+                    drawScore = font.render(f'Score: {scores - 1}', True, (47, 248, 82))
 
     if scores == 10:
         speed = 7
