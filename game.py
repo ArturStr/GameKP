@@ -39,9 +39,21 @@ right = False
 boomCount = 0
 g_over = True
 
-font = pg.font.SysFont('comicsansms', 15, True, True)
-drawScore = font.render(f'Score: {scores - 1}', True, (47, 248, 82))
-drawHP = font.render(f'HP: {HP}', True, (255, 18, 13))
+font_15 = pg.font.SysFont('comicsansms', 15, True, True)
+font_20 = pg.font.SysFont('comicsansms', 20, True, True)
+drawScore = font_15.render(f'Score: {scores - 1}', True, (47, 248, 82))
+drawHP = font_15.render(f'HP: {HP}', True, (255, 18, 13))
+drawGameOver = font_20.render(f'GAME OVER', True, (255, 18, 13))
+drawRestart = font_15.render('"R" to restart', True, (255, 18, 13))
+
+
+
+def drawEndGame():
+    win.blit(bg, (0, bg_y))
+    win.blit(drawGameOver, (200, 200))
+    win.blit(drawScore, (227, 230))
+    win.blit(drawRestart, (207, 260))
+    pg.display.update()
 
 
 def drawWindow():
@@ -73,6 +85,7 @@ def drawWindow():
     pg.display.update()
 
 
+end = False
 run = True
 while run:
     clock.tick(30)
@@ -122,10 +135,10 @@ while run:
         else:
             enemies.pop(enemies.index(enemy))
             HP -= 1
-            drawHP = font.render(f'HP: {HP}', True, (255, 18, 13))
+            drawHP = font_15.render(f'HP: {HP}', True, (255, 18, 13))
             if HP == 0:
                 pg.time.delay(200)
-                run = False
+                end = True
 
     if len(enemies) < random.randint(2, 5) and planeRate % 8 == 0:
         enemies.append(EnemyPlane(random.randint(20, 420), -55,
@@ -145,7 +158,7 @@ while run:
                     bullets.pop(bullets.index(bullet))
                     hits.append([enemy.x, enemy.y])
                     scores += 1
-                    drawScore = font.render(f'Score: {scores - 1}', True, (47, 248, 82))
+                    drawScore = font_15.render(f'Score: {scores - 1}', True, (47, 248, 82))
 
     if scores == 10:
         speed = 7
@@ -155,6 +168,22 @@ while run:
     elif scores == 120:
         enemySpeed = 6
 
-    drawWindow()
+    if end:
+        drawEndGame()
+        if keys[pg.K_r]:
+            end = False
+            planeRate = 0
+            enemySpeed = 3
+            bulletSpeed = 8
+            rate = 0
+            scores = 1
+            HP = 5
+            drawHP = font_15.render(f'HP: {HP}', True, (255, 18, 13))
+            drawScore = font_15.render(f'Score: {scores - 1}', True, (47, 248, 82))
+            bullets = []
+            enemies = []
+            hits = []
+    else:
+        drawWindow()
 
 pg.quit()
